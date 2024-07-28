@@ -158,6 +158,16 @@ document.addEventListener('DOMContentLoaded', function () {
         quotes = mergedQuotes;
         saveQuotes();
         populateCategories();
+  
+        // POST updated quotes to the server
+        await fetch('https://jsonplaceholder.typicode.com/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(quotes)
+        });
+  
         showRandomQuote();
         alert('Quotes synchronized with server successfully!');
       } catch (error) {

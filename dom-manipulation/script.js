@@ -10,6 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const exportButton = document.getElementById('exportQuotes');
     const importFileInput = document.getElementById('importFile');
     const categoryFilter = document.getElementById('categoryFilter');
+    const syncButton = document.createElement('button');
+    syncButton.id = 'syncQuotes';
+    syncButton.textContent = 'Sync Quotes';
+    document.body.appendChild(syncButton);
   
     // Function to save quotes to local storage
     function saveQuotes() {
@@ -43,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
       quotes.push(newQuote);
       saveQuotes();
       populateCategories();
+      syncWithServer();
   
       // Clear input fields
       document.getElementById('newQuoteText').value = '';
@@ -129,10 +134,34 @@ document.addEventListener('DOMContentLoaded', function () {
       localStorage.setItem('selectedCategory', categoryFilter.value);
     }
   
+    // Function to sync with the server
+    async function syncWithServer() {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(quotes)
+        });
+        if (!response.ok) throw new Error('Failed to sync with server');
+        const serverQuotes = await response.json();
+        quotes = serverQuotes;
+        saveQuotes();
+        populateCategories();
+        showRandomQuote();
+        alert('Quotes synchronized with server successfully!');
+      } catch (error) {
+        console.error('Sync error:', error);
+        alert('Failed to sync with server. Please try again later.');
+      }
+    }
+  
     // Attach event listeners
     newQuoteButton.addEventListener('click', showRandomQuote);
     importFileInput.addEventListener('change', importFromJsonFile);
     exportButton.addEventListener('click', exportToJsonFile);
+    syncButton.addEventListener('click', syncWithServer);
   
     // Create the form for adding a new quote
     createAddQuoteForm();

@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
   
         showRandomQuote();
-        alert('Quotes synchronized with server successfully!');
+        alert('Quotes synced with server!');
       } catch (error) {
         console.error('Sync error:', error);
         alert('Failed to sync with server. Please try again later.');

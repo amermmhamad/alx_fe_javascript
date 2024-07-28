@@ -134,19 +134,28 @@ document.addEventListener('DOMContentLoaded', function () {
       localStorage.setItem('selectedCategory', categoryFilter.value);
     }
   
+    // Function to fetch quotes from the server
+    async function fetchQuotesFromServer() {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+        if (!response.ok) throw new Error('Failed to fetch quotes from server');
+        const serverQuotes = await response.json();
+        return serverQuotes.map((quote, index) => ({
+          text: quote.body,
+          category: `Category ${index % 3 + 1}` // Simulate categories
+        }));
+      } catch (error) {
+        console.error('Fetch error:', error);
+        return [];
+      }
+    }
+  
     // Function to sync with the server
     async function syncWithServer() {
       try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(quotes)
-        });
-        if (!response.ok) throw new Error('Failed to sync with server');
-        const serverQuotes = await response.json();
-        quotes = serverQuotes;
+        const serverQuotes = await fetchQuotesFromServer();
+        const mergedQuotes = [...new Set([...quotes, ...serverQuotes])]; // Simple conflict resolution: merge and remove duplicates
+        quotes = mergedQuotes;
         saveQuotes();
         populateCategories();
         showRandomQuote();

@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function syncWithServer() {
       try {
         const serverQuotes = await fetchQuotesFromServer();
-        const mergedQuotes = [...new Set([...quotes, ...serverQuotes])]; // Simple conflict resolution: merge and remove duplicates
+        const mergedQuotes = [...new Set([...quotes, ...serverQuotes].map(q => JSON.stringify(q)))].map(q => JSON.parse(q)); // Simple conflict resolution: merge and remove duplicates
         quotes = mergedQuotes;
         saveQuotes();
         populateCategories();
@@ -194,5 +194,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Populate category filter options and show an initial random quote
     populateCategories();
     showRandomQuote();
+  
+    // Periodically sync with the server every 5 minutes
+    setInterval(syncWithServer, 5 * 60 * 1000); // 5 minutes in milliseconds
   });
   

@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
   
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteButton = document.getElementById('newQuote');
-    const addQuoteButton = document.getElementById('addQuoteBtn');
     const exportButton = document.getElementById('exportQuotes');
     const importFileInput = document.getElementById('importFile');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const newQuote = { text: newQuoteText, category: newQuoteCategory };
       quotes.push(newQuote);
       saveQuotes();
-      updateCategoryFilter();
+      populateCategories();
   
       // Clear input fields
       document.getElementById('newQuoteText').value = '';
@@ -97,14 +96,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const importedQuotes = JSON.parse(event.target.result);
         quotes.push(...importedQuotes);
         saveQuotes();
-        updateCategoryFilter();
+        populateCategories();
         alert('Quotes imported successfully!');
       };
       fileReader.readAsText(event.target.files[0]);
     }
   
-    // Function to update the category filter options
-    function updateCategoryFilter() {
+    // Function to populate categories in the dropdown
+    function populateCategories() {
       const categories = [...new Set(quotes.map(quote => quote.category))];
       categoryFilter.innerHTML = '<option value="all">All Categories</option>';
       categories.forEach(category => {
@@ -130,5 +129,22 @@ document.addEventListener('DOMContentLoaded', function () {
       localStorage.setItem('selectedCategory', categoryFilter.value);
     }
   
-    // 
+    // Attach event listeners
+    newQuoteButton.addEventListener('click', showRandomQuote);
+    importFileInput.addEventListener('change', importFromJsonFile);
+    exportButton.addEventListener('click', exportToJsonFile);
+  
+    // Create the form for adding a new quote
+    createAddQuoteForm();
+  
+    // Load the last selected category from local storage
+    const savedCategory = localStorage.getItem('selectedCategory');
+    if (savedCategory) {
+      categoryFilter.value = savedCategory;
+    }
+  
+    // Populate category filter options and show an initial random quote
+    populateCategories();
+    showRandomQuote();
+  });
   
